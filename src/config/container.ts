@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
 import { container } from 'tsyringe';
 
@@ -8,6 +8,10 @@ import { LocationBanRepo } from '../adapters/driven/locationBanRepo';
 
 import { MeteoRepo } from '../adapters/driven/meteoRepo';
 import { MeteoMetRepo } from '../adapters/driven/meteoMetRepo';
+
+dotenv.config({
+    quiet: true,
+});
 
 const locationProvider = process.env.LOCATION_PROVIDER || 'BAN';
 const meteoProvider = process.env.METEO_PROVIDER || 'OPEN_METEO';
