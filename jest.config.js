@@ -8,4 +8,10 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+
+  setupFiles: [
+      'reflect-metadata/Reflect.js'
+  ],
 };
