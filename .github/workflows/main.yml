@@ -1,0 +1,27 @@
+name: License Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check licenses
+        run: |
+          npx license-checker --onlyAllow \
+            "MIT;ISC;BSD-2-Clause;BSD-3-Clause;Apache-2.0;BlueOak-1.0.0;0BSD;CC0-1.0;CC-BY-3.0;CC-BY-4.0;(MIT OR CC0-1.0);(MIT AND CC-BY-3.0)"
