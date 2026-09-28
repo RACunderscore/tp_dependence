@@ -1,19 +1,18 @@
-import { Express, Request, Response } from 'express';
-import { injectable } from 'tsyringe';
-import { MeteoService } from '../../services/meteoService';
-import { LocationService } from '../../services/locationService';
+import { Express, Request, Response } from "express";
+import { inject, injectable } from "tsyringe";
+
+import { MeteoServiceFactory } from "../../services/meteoServiceFactory";
 
 @injectable()
 export class MeteoController {
-
     constructor(
-        private readonly locationService: LocationService,
-        private readonly meteoService: MeteoService
+        @inject("MeteoServiceFactory")
+        private readonly serviceFactory: MeteoServiceFactory
     ) {}
 
     registerRoutes(app: Express): void {
         app.get(
-            '/meteo/:name',
+            "/meteo/:name/:demo",
             this.getMeteoFromLocation.bind(this)
         );
     }
@@ -23,10 +22,15 @@ export class MeteoController {
         res: Response
     ): Promise<void> {
         try {
-            const { name } = req.params;
+            const name = req.params.name;
+            const demo = req.params.demo === "true";
 
-            const locations =
-                await this.locationService.listLocations(name);
+            const {
+                locationService,
+                meteoService,
+            } = this.serviceFactory.create(demo);
+
+            const locations = await locationService.listLocations(name);
 
             if (locations.length === 0) {
                 res.status(404).json({
@@ -37,16 +41,14 @@ export class MeteoController {
 
             const location = locations[0];
 
-            const meteo =
-                await this.meteoService.listMeteo(location);
+            const meteo = await meteoService.listMeteo(location);
 
             res.json(meteo);
-
         } catch (error) {
             console.error(error);
 
             res.status(500).json({
-                error: 'Unable to retrieve weather data',
+                error: "Unable to retrieve weather data",
             });
         }
     }

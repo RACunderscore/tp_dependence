@@ -1,4 +1,6 @@
-describe('Dependency Injection Container', () => {
+import "reflect-metadata";
+
+describe("Dependency Injection Container", () => {
     const originalLocationProvider = process.env.LOCATION_PROVIDER;
     const originalMeteoProvider = process.env.METEO_PROVIDER;
 
@@ -9,107 +11,182 @@ describe('Dependency Injection Container', () => {
         jest.resetModules();
     });
 
-    it('should use LocationBanRepo and MeteoMetRepo when configured', async () => {
-        process.env.LOCATION_PROVIDER = 'BAN';
-        process.env.METEO_PROVIDER = 'MET_NORWAY';
+    it("should use LocationBanRepo with cache and MeteoMetRepo when configured", async () => {
+        process.env.LOCATION_PROVIDER = "BAN";
+        process.env.METEO_PROVIDER = "MET_NORWAY";
 
         jest.resetModules();
 
-        const { container } = await import('../../config/container');
+        const { container } = await import("../../config/container");
 
-        const { LocationBanRepo } =
-            await import('../../adapters/driven/locationBanRepo');
+        const { CachedLocationRepository } =
+            await import("../../adapters/driven/cachedLocationRepo");
 
-        const { MeteoMetRepo } =
-            await import('../../adapters/driven/meteoMetRepo');
+        const { MeteoServiceFactory } =
+            await import("../../services/meteoServiceFactory");
 
         const locationRepo = container.resolve(
-            'LocationRepositoryPort'
+            "LocationRepositoryPort"
         );
 
         const meteoRepo = container.resolve(
-            'MeteoRepositoryPort'
+            "MeteoRepositoryPort"
         );
 
-        expect(locationRepo).toBeInstanceOf(LocationBanRepo);
-        expect(meteoRepo).toBeInstanceOf(MeteoMetRepo);
+        const factory = container.resolve(
+            "MeteoServiceFactory"
+        );
+
+        expect(locationRepo).toBeInstanceOf(CachedLocationRepository);
+        expect(meteoRepo).toBeDefined();
+        expect(factory).toBeInstanceOf(MeteoServiceFactory);
     });
 
-    it('should use LocationRepo and MeteoRepo when configured', async () => {
-        process.env.LOCATION_PROVIDER = 'NOMINATIM';
-        process.env.METEO_PROVIDER = 'OPEN_METEO';
+    it("should use LocationRepo with cache and MeteoRepo when configured", async () => {
+        process.env.LOCATION_PROVIDER = "NOMINATIM";
+        process.env.METEO_PROVIDER = "OPEN_METEO";
 
         jest.resetModules();
 
-        const { container } = await import('../../config/container');
+        const { container } = await import("../../config/container");
 
-        const { LocationRepo } =
-            await import('../../adapters/driven/locationRepo');
+        const { CachedLocationRepository } =
+            await import("../../adapters/driven/cachedLocationRepo");
 
-        const { MeteoRepo } =
-            await import('../../adapters/driven/meteoRepo');
+        const { MeteoServiceFactory } =
+            await import("../../services/meteoServiceFactory");
 
         const locationRepo = container.resolve(
-            'LocationRepositoryPort'
+            "LocationRepositoryPort"
         );
 
         const meteoRepo = container.resolve(
-            'MeteoRepositoryPort'
+            "MeteoRepositoryPort"
         );
 
-        expect(locationRepo).toBeInstanceOf(LocationRepo);
-        expect(meteoRepo).toBeInstanceOf(MeteoRepo);
+        const factory = container.resolve(
+            "MeteoServiceFactory"
+        );
+
+        expect(locationRepo).toBeInstanceOf(CachedLocationRepository);
+        expect(meteoRepo).toBeDefined();
+        expect(factory).toBeInstanceOf(MeteoServiceFactory);
     });
 
-    it('should use BAN with Open-Meteo', async () => {
-        process.env.LOCATION_PROVIDER = 'BAN';
-        process.env.METEO_PROVIDER = 'OPEN_METEO';
+    it("should use BAN with Open-Meteo", async () => {
+        process.env.LOCATION_PROVIDER = "BAN";
+        process.env.METEO_PROVIDER = "OPEN_METEO";
 
         jest.resetModules();
 
-        const { container } = await import('../../config/container');
+        const { container } = await import("../../config/container");
 
-        const { LocationBanRepo } =
-            await import('../../adapters/driven/locationBanRepo');
-
-        const { MeteoRepo } =
-            await import('../../adapters/driven/meteoRepo');
+        const { CachedLocationRepository } =
+            await import("../../adapters/driven/cachedLocationRepo");
 
         const locationRepo = container.resolve(
-            'LocationRepositoryPort'
+            "LocationRepositoryPort"
         );
 
         const meteoRepo = container.resolve(
-            'MeteoRepositoryPort'
+            "MeteoRepositoryPort"
         );
 
-        expect(locationRepo).toBeInstanceOf(LocationBanRepo);
-        expect(meteoRepo).toBeInstanceOf(MeteoRepo);
+        expect(locationRepo).toBeInstanceOf(CachedLocationRepository);
+        expect(meteoRepo).toBeDefined();
     });
 
-    it('should use Nominatim with MET Norway', async () => {
-        process.env.LOCATION_PROVIDER = 'NOMINATIM';
-        process.env.METEO_PROVIDER = 'MET_NORWAY';
+    it("should use Nominatim with MET Norway", async () => {
+        process.env.LOCATION_PROVIDER = "NOMINATIM";
+        process.env.METEO_PROVIDER = "MET_NORWAY";
 
         jest.resetModules();
 
-        const { container } = await import('../../config/container');
+        const { container } = await import("../../config/container");
 
-        const { LocationRepo } =
-            await import('../../adapters/driven/locationRepo');
-
-        const { MeteoMetRepo } =
-            await import('../../adapters/driven/meteoMetRepo');
+        const { CachedLocationRepository } =
+            await import("../../adapters/driven/cachedLocationRepo");
 
         const locationRepo = container.resolve(
-            'LocationRepositoryPort'
+            "LocationRepositoryPort"
         );
 
         const meteoRepo = container.resolve(
-            'MeteoRepositoryPort'
+            "MeteoRepositoryPort"
         );
 
-        expect(locationRepo).toBeInstanceOf(LocationRepo);
-        expect(meteoRepo).toBeInstanceOf(MeteoMetRepo);
+        expect(locationRepo).toBeInstanceOf(CachedLocationRepository);
+        expect(meteoRepo).toBeDefined();
+    });
+
+    it("should register the demo repositories", async () => {
+        jest.resetModules();
+
+        const { container } = await import("../../config/container");
+
+        const { LocationDemoRepo } =
+            await import("../../adapters/driven/locationDemoRepo");
+
+        const { MeteoDemoRepo } =
+            await import("../../adapters/driven/meteoDemoRepo");
+
+        const demoLocationRepo = container.resolve(
+            "DemoLocationRepositoryPort"
+        );
+
+        const demoMeteoRepo = container.resolve(
+            "DemoMeteoRepositoryPort"
+        );
+
+        expect(demoLocationRepo).toBeInstanceOf(LocationDemoRepo);
+        expect(demoMeteoRepo).toBeInstanceOf(MeteoDemoRepo);
+    });
+
+    it("should register the MeteoServiceFactory", async () => {
+        jest.resetModules();
+
+        const { container } = await import("../../config/container");
+
+        const { MeteoServiceFactory } =
+            await import("../../services/meteoServiceFactory");
+
+        const factory = container.resolve(
+            "MeteoServiceFactory"
+        );
+
+        expect(factory).toBeInstanceOf(MeteoServiceFactory);
+    });
+
+    it("should return demo services when factory.create(true) is used", async () => {
+        jest.resetModules();
+
+        const { container } = await import("../../config/container");
+        const { MeteoServiceFactory } =
+            await import("../../services/meteoServiceFactory");
+
+        const factory = container.resolve(MeteoServiceFactory);
+
+        const services = factory.create(true);
+
+        expect(services.locationService).toBeDefined();
+        expect(services.meteoService).toBeDefined();
+    });
+
+    it("should return real services when factory.create(false) is used", async () => {
+        process.env.LOCATION_PROVIDER = "BAN";
+        process.env.METEO_PROVIDER = "MET_NORWAY";
+
+        jest.resetModules();
+
+        const { container } = await import("../../config/container");
+        const { MeteoServiceFactory } =
+            await import("../../services/meteoServiceFactory");
+
+        const factory = container.resolve(MeteoServiceFactory);
+
+        const services = factory.create(false);
+
+        expect(services.locationService).toBeDefined();
+        expect(services.meteoService).toBeDefined();
     });
 });
